@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Endgame Gear OP1 8K — Web Configuration</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <h1>Endgame Gear OP1 8K</h1>
+        <span class="subtitle">Web Configuration Tool</span>
+      </div>
+      <div class="device-bar">
+        <button id="connect" type="button">Connect</button>
+        <span id="device-name" class="device-name">No device</span>
+        <span id="fw-version" class="badge" hidden>Firmware —</span>
+        <span id="sw-version" class="badge" hidden>Software —</span>
+      </div>
+    </header>
+
+    <main>
+      <nav class="tabs" role="tablist">
+        <button class="tab" role="tab" data-tab="basic" aria-selected="true">Basic Settings</button>
+        <button class="tab" role="tab" data-tab="advanced" aria-selected="false">Advanced Settings</button>
+        <button class="tab" role="tab" data-tab="buttons" aria-selected="false">Button Mapping</button>
+      </nav>
+
+      <section class="panel" data-panel="basic"></section>
+      <section class="panel" data-panel="advanced" hidden></section>
+      <section class="panel" data-panel="buttons" hidden></section>
+    </main>
+
+    <footer class="app-footer">
+      <span id="status" class="status">Disconnected</span>
+      <div class="footer-actions">
+        <button id="factory-reset" type="button" disabled>Factory Reset</button>
+        <button id="apply" type="button" class="primary" disabled>Apply</button>
+      </div>
+    </footer>
+
+    <div id="unsupported" class="overlay" hidden>
+      <div class="dialog">
+        <h2>WebHID not available</h2>
+        <p>
+          This tool needs the Web HID API. Use a Chromium-based browser
+          (Chrome or Edge) and load the page over <code>https://</code> or
+          <code>http://localhost</code>.
+        </p>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

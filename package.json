@@ -1,0 +1,19 @@
+{
+  "name": "endgame-op1-8k-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "WebHID configuration tool for the Endgame Gear OP1 8K gaming mouse",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
+  }
+}

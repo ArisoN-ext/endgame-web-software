@@ -1,0 +1,11 @@
+# Endgame Gear OP1 8K (wired) — allow Chromium's WebHID backend to open the
+# vendor HID interface without root.
+#
+# Install:
+#   sudo cp udev/70-endgame-op1.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+# Then unplug/replug the mouse (or re-open the browser tab).
+#
+# If `open()` still fails, the browser process itself may need to be restarted.
+
+KERNEL=="hidraw*", ATTRS{idVendor}=="3367", ATTRS{idProduct}=="1964", MODE="0666", TAG+="uaccess"
