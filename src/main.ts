@@ -1,5 +1,5 @@
 import { en } from "./i18n/en";
-import { decodeConfig, encodeConfig, type MouseConfig } from "./protocol/codec";
+import { decodeConfig, encodeConfig, sanitizeConfig, type MouseConfig } from "./protocol/codec";
 import type { MouseEvent } from "./protocol/events";
 import { Op1Transport } from "./transport";
 import { describeDevice, getAuthorisedOp1Devices, isWebHidSupported, requestOp1Device } from "./webhid";
@@ -130,6 +130,7 @@ async function connect(): Promise<void> {
       throw new Error(`Config read failed: ${describeError(error)}`);
     }
     config = decodeConfig(baseBuffer);
+    const fixed = sanitizeConfig(config);
     unsubscribe = next.onEvent(handleEvent);
 
     console.info("[op1] decoded config", summarizeConfig(config));
@@ -149,8 +150,8 @@ async function connect(): Promise<void> {
 
     connectButton.textContent = en.disconnect;
     resetButton.disabled = false;
-    setDirty(false);
-    setStatus(en.status.connected);
+    setDirty(fixed);
+    setStatus(fixed ? en.status.dirty : en.status.connected);
     renderActive();
   } catch (error) {
     console.error("[op1] connect failed", error);
@@ -234,7 +235,7 @@ async function apply(): Promise<void> {
     baseBuffer = await transport.readConfig();
     config = decodeConfig(baseBuffer);
     console.info("[op1] after store", summarizeConfig(config));
-    setDirty(false);
+    setDirty(sanitizeConfig(config));
     renderActive();
     setStatus(en.status.applied);
   } catch (error) {
@@ -249,7 +250,7 @@ async function factoryReset(): Promise<void> {
     await transport.factoryReset();
     baseBuffer = await transport.readConfig();
     config = decodeConfig(baseBuffer);
-    setDirty(false);
+    setDirty(sanitizeConfig(config));
     renderActive();
     setStatus(en.status.applied);
   } catch (error) {

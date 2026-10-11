@@ -102,6 +102,19 @@ export function swapHandedness(config: MouseConfig): void {
   config.leftHanded = !config.leftHanded;
 }
 
+/**
+ * Motion Sync and 8000 Hz are mutually exclusive on the OP1 8K: Endgame Gear
+ * state it is a sensor limitation, and the vendor tool removes the 8000 Hz
+ * option while Motion Sync is on. Returns true if a fix-up was applied.
+ */
+export function sanitizeConfig(config: MouseConfig): boolean {
+  if (config.motionSync && config.polling === 8000) {
+    config.polling = 4000;
+    return true;
+  }
+  return false;
+}
+
 const ACTION_LABELS: Partial<Record<ButtonAction["key"], string>> = Object.fromEntries(
   ACTION_OPTIONS.map((option) => [option.key, option.label]),
 );

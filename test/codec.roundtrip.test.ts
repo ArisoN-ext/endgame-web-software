@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeConfig, encodeConfig, swapHandedness } from "../src/protocol/codec";
+import { decodeConfig, encodeConfig, sanitizeConfig, swapHandedness } from "../src/protocol/codec";
 import { decodeAction, encodeAction, isLeftHanded, readAction, writeAction } from "../src/protocol/buttons";
 import { clampCpi } from "../src/protocol/cpi";
 import { CONFIG_REPORT_SIZE, OFFSET, REPORT_CONFIG } from "../src/protocol/op1";
@@ -92,8 +92,18 @@ describe("codec roundtrip", () => {
   });
 });
 
-describe("CPI clamping", () => {
-  it("clamps to the OP1 8K range and 50-step", () => {
+describe("Motion Sync / 8000 Hz exclusivity", () => {
+  it("drops 8000 Hz when Motion Sync is enabled", () => {
+    const config = decodeConfig(blankReport());
+    config.polling = 8000;
+    config.motionSync = true;
+    expect(sanitizeConfig(config)).toBe(true);
+    expect(config.polling).toBe(4000);
+    expect(sanitizeConfig(config)).toBe(false);
+  });
+});
+
+describe("CPI clamping", () => {  it("clamps to the OP1 8K range and 50-step", () => {
     expect(clampCpi(10)).toBe(50);
     expect(clampCpi(1600)).toBe(1600);
     expect(clampCpi(1601)).toBe(1600);

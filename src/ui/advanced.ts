@@ -10,10 +10,15 @@ export function renderAdvanced(root: HTMLElement, ctx: UiContext): void {
   root.replaceChildren();
 
   const performance = el("section", { class: "card" }, [el("h2", {}, ["Performance"])]);
+  // Motion Sync cannot run at 8000 Hz (sensor limitation); the vendor tool drops
+  // the 8000 Hz option while it is enabled.
+  const pollingRates = cfg.motionSync ? POLLING_RATES.filter((rate) => rate !== 8000) : POLLING_RATES;
   performance.append(
     checkbox("Motion Sync", cfg.motionSync, (value) => {
       cfg.motionSync = value;
+      if (value && cfg.polling === 8000) cfg.polling = 4000;
       ctx.markDirty();
+      ctx.requestRender();
     }),
     checkbox("Glass Mode", cfg.glassMode, (value) => {
       cfg.glassMode = value;
@@ -24,13 +29,14 @@ export function renderAdvanced(root: HTMLElement, ctx: UiContext): void {
     field(
       "Polling Rate",
       select(
-        POLLING_RATES.map((rate) => ({ value: rate, label: `${rate} Hz` })),
+        pollingRates.map((rate) => ({ value: rate, label: `${rate} Hz` })),
         cfg.polling,
         (value) => {
           cfg.polling = value;
           ctx.markDirty();
         },
       ),
+      cfg.motionSync ? { hint: "Motion Sync is on: 8000 Hz is unavailable." } : {},
     ),
   );
 
