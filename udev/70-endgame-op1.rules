@@ -1,6 +1,18 @@
 # Endgame Gear OP1 8K (wired) — allow Chromium's WebHID backend to open the
 # vendor HID interface without root.
 #
+# The mouse exposes two HID interfaces with the same VID/PID:
+#   interface 0 (bInterfaceNumber 00) — standard mouse (X/Y, buttons, wheel)
+#   interface 1 (bInterfaceNumber 01) — vendor config collection (usagePage 0xFF01)
+# WebHID talks to interface 1 only, so match it explicitly and leave the input
+# interface to the kernel's default input rules.
+#
+# udev gotcha: every ATTRS{} key in a single rule must match the SAME parent.
+# idVendor/idProduct live on the USB device, bInterfaceNumber on the USB
+# interface, so `ATTRS{idVendor}=="3367", ATTRS{bInterfaceNumber}=="01"` never
+# matches. Use the ID_VENDOR_ID / ID_MODEL_ID properties (imported by
+# 60-persistent-hidraw.rules via the usb_id builtin) instead.
+#
 # Install:
 #   sudo cp udev/70-endgame-op1.rules /etc/udev/rules.d/
 #   sudo udevadm control --reload-rules && sudo udevadm trigger
@@ -8,4 +20,4 @@
 #
 # If `open()` still fails, the browser process itself may need to be restarted.
 
-KERNEL=="hidraw*", ATTRS{idVendor}=="3367", ATTRS{idProduct}=="1964", MODE="0666", TAG+="uaccess"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ENV{ID_VENDOR_ID}=="3367", ENV{ID_MODEL_ID}=="1964", ATTRS{bInterfaceNumber}=="01", MODE="0666", TAG+="uaccess"
